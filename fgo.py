@@ -13,11 +13,15 @@ API = 'https://api.telegram.org/bot'
 API_TOKEN = environ['API_TOKEN']
 URL = API + API_TOKEN
 TIMEZONE = -8
-BOT_NAME = '@FGO_Platy_Bot'
+BOT_NAME = '@FGO_Platy_bot'
 REFRESH_RATE = 60
 
 with open('id.txt') as f:
 	allChatID = f.read().strip().split('\n')
+	try:
+		allChatID.remove('')
+	except:
+		pass
 
 with open('lines.txt') as f:
 	lines = f.read().strip().split('\n')
@@ -45,7 +49,8 @@ def removeID(cid):
 		pass
 
 def blastMsg(whut, cid):
-	sendMessage(int(cid), '{}\nRemember to collect your daily login!'.format(choice(lines)))
+	print('Blasting', cid)
+	sendMessage(int(cid), '{}\n~ Astolfo ♥\n\nRemember to collect your daily login!'.format(choice(lines)))
 
 def getNew():
 	data = getUpdates()['result']
@@ -54,13 +59,16 @@ def getNew():
 		location = int(f.read())
 
 	for i in range(location, len(data)):
-		current_id = data[i]['message']['chat']['id']
 		try:
+			current_id = data[i]['message']['chat']['id']
 			current_text = data[i]['message']['text']
+			current_type = data[i]['message']['chat']['type']
 		except:
+			current_id = 0
 			current_text = ''
-		current_type = data[i]['message']['chat']['type']
-		
+			current_type = 'NOPPU'
+
+
 		if current_text == '/start' and current_type == 'private' or current_text == '/start' + BOT_NAME:
 			print('Added', current_id)
 			storeID(current_id)
@@ -75,6 +83,7 @@ def getNew():
 		f.write('\n'.join(allChatID))
 
 def main():
+	print('Started')
 	while True:
 		time = str(datetime.now().time()).split(':')
 		
