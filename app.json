@@ -1,0 +1,5 @@
+{
+	"name": "Fate Grind Order",
+	"description": "Reminds people about fgo daily logins",
+	"image": "heroku/python"
+}
