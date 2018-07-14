@@ -110,8 +110,7 @@ def main():
 	while True:
 		time = str(datetime.now().time()).split(':')
 		
-		#if int(time[0]) == 16 + TIMEZONE and int(time[1]) == 12:
-		if True:
+		if int(time[0]) == 16 + TIMEZONE and int(time[1]) == 12:
 			getNew()
 			update = maintenance()
 			for i in allChatID:
