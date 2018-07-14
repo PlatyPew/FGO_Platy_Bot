@@ -13,7 +13,7 @@ import re
 API = 'https://api.telegram.org/bot'
 API_TOKEN = environ['API_TOKEN']
 URL = API + API_TOKEN
-TIMEZONE = 0
+TIMEZONE = -8
 BOT_NAME = '@FGO_Platy_bot'
 REFRESH_RATE = 60
 SGT = 15
@@ -27,10 +27,6 @@ with open('id.txt') as f:
 
 with open('lines.txt') as f:
 	lines = f.read().strip().split('\n')
-
-def getMe(): # Get info on bot
-	r = requests.get(URL + '/getme')
-	return json.loads(r.text)
 
 def getUpdates(): # Get messages sent to bot
 	r = requests.get(URL + '/getupdates')
@@ -110,7 +106,7 @@ def main():
 	while True:
 		time = str(datetime.now().time()).split(':')
 		
-		if int(time[0]) == 16 + TIMEZONE and int(time[1]) == 12:
+		if int(time[0]) == 12 + TIMEZONE and int(time[1]) == 0:
 			getNew()
 			update = maintenance()
 			for i in allChatID:
