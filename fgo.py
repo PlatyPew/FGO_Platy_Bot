@@ -2,7 +2,6 @@
 
 import requests
 import json
-from pprint import pprint
 from time import sleep
 from datetime import datetime, timedelta
 import threading
