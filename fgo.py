@@ -13,9 +13,10 @@ API = 'https://api.telegram.org/bot'
 API_TOKEN = environ['API_TOKEN']
 URL = API + API_TOKEN
 TIMEZONE = -8
-BOT_NAME = '@FGO_Platy_bot'.lower()
+BOT_NAME = '@FGO_Platy_Bot'.lower()
 REFRESH_RATE = 60
 SGT = 15
+LIMIT = 100
 
 with open('id.txt') as f:
 	allChatID = f.read().strip().split('\n')
@@ -27,8 +28,8 @@ with open('id.txt') as f:
 with open('lines.txt') as f:
 	lines = f.read().strip().split('\n')
 
-def getUpdates(): # Get messages sent to bot
-	r = requests.get(URL + '/getupdates')
+def getUpdates(update_id): # Get messages sent to bot
+	r = requests.get(URL + '/getupdates', params={'offset': update_id, 'limit': LIMIT})
 	return json.loads(r.text)
 
 def sendMessage(cid, text='Welcome to Fate Grind Order!'):
@@ -46,33 +47,38 @@ def removeID(cid):
 		pass
 
 def blastMsg(whut, cid):
-	sendMessage(int(cid), '*Daily Login Reminder!*\n{}\n~ _Astolfo_ ♥'.format(choice(lines)))
+	sendMessage(int(cid), '*Daily Login Reminder!*\n{}\n_~ Astolfo_ ♥'.format(choice(lines)))
 
 def getNew():
-	data = getUpdates()['result']
+	while True:
+		with open('msg.txt', 'r') as f:
+			update_id = int(f.read())
 
-	with open('msg.txt', 'r') as f:
-		location = int(f.read())
+		data = getUpdates(update_id)['result']
 
-	for i in range(location, len(data)):
-		try:
-			current_id = data[i]['message']['chat']['id']
-			current_text = data[i]['message']['text'].lower()
-			current_type = data[i]['message']['chat']['type']
-		except:
-			current_id = 0
-			current_text = ''
-			current_type = 'NOPPU'
+		if len(data) == 0:
+			break
 
-		if current_text == '/start' and current_type == 'private' or current_text == '/start{}'.format(BOT_NAME):
-			print('Added', current_id)
-			storeID(current_id)
-		elif current_text == '/stop' and current_type == 'private' or current_text == '/stop{}'.format(BOT_NAME):
-			print('Removed', current_id)
-			removeID(current_id)
+		for msg in data:
+			try:
+				current_id = msg['message']['chat']['id']
+				current_text = msg['message']['text'].lower()
+				current_type = msg['message']['chat']['type']
+				update_id = msg['update_id']
+			except:
+				current_text = None
+				current_type = None
 
-		with open('msg.txt', 'w') as f:
-			f.write(str(i + 1))
+			if current_text == '/start' and current_type == 'private' or current_text == '/start{}'.format(BOT_NAME):
+				print('Added', current_id)
+				storeID(current_id)
+			elif current_text == '/stop' and current_type == 'private' or current_text == '/stop{}'.format(BOT_NAME):
+				print('Removed', current_id)
+				removeID(current_id)
+
+		if update_id > 0:
+			with open('msg.txt', 'w') as f:
+				f.write(str(update_id + 1))
 
 	with open('id.txt', 'w') as f:
 		f.write('\n'.join(allChatID))
@@ -97,7 +103,7 @@ def maintenance():
 	return updates.strip()
 
 def blastMaintain(whut, cid, details):
-	sendMessage(int(cid), '*Maintenance updates:*\n{}\n~ _Astolfo_ ♥'.format(details))
+	sendMessage(int(cid), '*Maintenance updates:*\n{}\n_~ Astolfo_ ♥'.format(details))
 
 def main():
 	print('------- Started -------')
