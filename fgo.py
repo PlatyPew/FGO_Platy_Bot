@@ -13,7 +13,7 @@ API = 'https://api.telegram.org/bot'
 API_TOKEN = environ['API_TOKEN']
 URL = API + API_TOKEN
 TIMEZONE = -8
-BOT_NAME = '@FGO_Platy_bot'
+BOT_NAME = '@FGO_Platy_bot'.lower()
 REFRESH_RATE = 60
 SGT = 15
 
@@ -57,18 +57,17 @@ def getNew():
 	for i in range(location, len(data)):
 		try:
 			current_id = data[i]['message']['chat']['id']
-			current_text = data[i]['message']['text']
+			current_text = data[i]['message']['text'].lower()
 			current_type = data[i]['message']['chat']['type']
 		except:
 			current_id = 0
 			current_text = ''
 			current_type = 'NOPPU'
 
-
-		if current_text == '/start' and current_type == 'private' or current_text == '/start' + BOT_NAME:
+		if current_text == '/start' and current_type == 'private' or current_text == '/start{}'.format(BOT_NAME):
 			print('Added', current_id)
 			storeID(current_id)
-		elif current_text == '/stop' and current_type == 'private' or current_text == '/stop' + BOT_NAME:
+		elif current_text == '/stop' and current_type == 'private' or current_text == '/stop{}'.format(BOT_NAME):
 			print('Removed', current_id)
 			removeID(current_id)
 
@@ -101,11 +100,12 @@ def blastMaintain(whut, cid, details):
 	sendMessage(int(cid), '*Maintenance updates:*\n{}\n~ _Astolfo_ ♥'.format(details))
 
 def main():
-	print('Started')
+	print('------- Started -------')
+	print(API_TOKEN)
 	while True:
 		time = str(datetime.now().time()).split(':')
 		
-		if int(time[0]) == 12 + TIMEZONE and int(time[1]) == 0:
+		if int(time[0]) == 12 + TIMEZONE and int(time[1]) == 30:
 			getNew()
 			update = maintenance()
 			for i in allChatID:
